@@ -2,7 +2,7 @@
 #define LOGICAL
 void CMA(map <string,int>&registers)
 {
-        registers["A"]  = 255 - registers["A"] ;
+        registers["A"]  = 255 - registers["A"];       // complementing the number
 }
 
 void CMP(map <string,int>&registers,string &value,vector <bool>&flag)
@@ -13,6 +13,10 @@ void CMP(map <string,int>&registers,string &value,vector <bool>&flag)
     {
         flag[0] = 1;
         flag[4] = 1;
+    }
+    else if(val - val2 == 0)
+    {
+        flag[1] = 1;
     }
     else
     {

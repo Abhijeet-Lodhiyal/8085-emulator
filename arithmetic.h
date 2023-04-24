@@ -4,175 +4,144 @@
 using namespace std;
 #ifndef ARITH
 #define ARITH
-void ADD(map <string,string>& registers, string name,vector <bool>&flag) {
-    int a = hexToInt(registers["A"]);
-    a += hexToInt(registers[name]);
+void ADD(map <string,int>& registers, string name,vector <bool>&flag) {
+    int a = registers["A"];
+    a += registers[name];
+    checkParityAndFlags(a,flag);      // check flags
     if(a > 255)
     {
-        flag[4] = true;
         a = a % 256;
     }
-    else 
-        flag[4] = false;
-        registers["A"] = intToHex(a,2);
+    registers["A"] = a;
 }
-void ADI(map <string,string>&registers,string value ,vector <bool>&flag)
+void ADI(map <string,int>&registers,string value ,vector <bool>&flag)
 {
-    int a = hexToInt(registers["A"]);
-    a += hexToInt(value); 
+    int a = registers["A"];
+    a += convert(value); 
+    checkParityAndFlags(a,flag);
     if(a > 255)
     {
-        flag[4] = true;
         a = a % 256;
     }
-    else 
-        flag[4] = false;
-    registers["A"] = intToHex(a,2);
+    registers["A"] = a;
 }
 
-void SUB( map <string,string>&registers,string &regist ,vector <bool>&flag)
+void SUB( map <string,int>&registers,string &regist ,vector <bool>&flag)
 {
-    int a = hexToInt(registers["A"]);
-    a -= hexToInt(registers[regist]);
-    if(a < 0)
-    {
-        flag[0] = true;
-        flag[4] = true;
-        registers["A"] = twoscomplement(a);
-    }
-    else
-    {
-        flag[0] = false;
-        flag[4] = false;
-        registers["A"] = intToHex(a,2);
-    }
+    int a = registers["A"];
+    a -= registers[regist];
+    checkParityAndFlags(a,flag);
+    registers["A"] = a;
 }
-void SUI(map <string,string>&registers, string value ,vector <bool>& flag)
+void SUI(map <string,int>&registers, string value ,vector <bool>& flag)
 {
-    int a = hexToInt(registers["A"]);
-    a -= hexToInt(value);
-    if(a < 0)
-    {
-        flag[0] = true;
-        flag[4] = true;
-        registers["A"]  = twoscomplement(a);
-    }
-    else
-    {
-        flag[0] = false;
-        flag[4] = false;
-        registers["A"]  = intToHex(a,2);
-    }
+    int a = registers["A"];
+    a -= convert(value);
+    checkParityAndFlags(a,flag);
+    registers["A"]  = a;
 }
 
-void INR( map <string,string>&registers,string &location ,vector <bool>&flag)
+void INR( map <string,int>&registers,string &location ,vector <bool>&flag)
 {
-    int temp = hexToInt(registers[location]);
+    int temp = registers[location];
     temp++;
     if(temp > 255)
     {
-        flag[4] = true;
-        registers[location] = "00";
+        registers[location] = 0;
     }
     else
     {
-        flag[4] = false;
-        registers[location] = intToHex(temp,2);
+        registers[location] = temp;
     }
+    checkParityAndFlags(temp,flag);
 }
 
-void DCR( map <string,string>&registers, string &locat ,vector <bool>& flag)
+void DCR( map <string,int>&registers, string &locat ,vector <bool>& flag)
 {
-    int temp = hexToInt(registers[locat]);
+    int temp = registers[locat];
     temp--;
-    if(temp < 0)
-    {
-        flag[0] = true;
-        registers[locat] = twoscomplement(temp);
-    }
-    else
-    {
-        flag[0] = false;
-        registers[locat] = intToHex(temp,2);
-    }
+    checkParityAndFlags(temp,flag);
+    registers[locat] = temp;
 }
 
-void INX( map <string,string>&registers , string &higherOrder,string& lowerOrder ,vector <bool>& flag)
+void INX( map <string,int>&registers , string &higherOrder,string& lowerOrder ,vector <bool>& flag)
 {
-    int temp = hexToInt(registers[lowerOrder]);
+    int temp = registers[lowerOrder];
     temp++;
+    checkParityAndFlags(temp,flag);
     if(temp > 255)
     {
-        flag[4] = true;
-        registers[lowerOrder] = "00";
-        int temp2 = hexToInt(registers[higherOrder]);
+        registers[lowerOrder] = 0;
+        int temp2 = registers[higherOrder];
         temp2++;
-        registers[higherOrder] = intToHex(temp2,2);
+        checkParityAndFlags(temp2,flag);
+        registers[higherOrder] = temp2;
     } 
     else
-        registers[lowerOrder] = intToHex(temp,2);
+        registers[lowerOrder] = temp;
+    
 }
-void DCX( map <string,string>&registers , string &higherOrder ,string& lowerOrder ,vector <bool>& flag)
+void DCX( map <string,int>&registers , string &higherOrder ,string& lowerOrder ,vector <bool>& flag)
 {
-    int temp = hexToInt(registers[lowerOrder]);
+    int temp = registers[lowerOrder];
     temp--;
+    checkParityAndFlags(temp,flag);
     if(temp < 0)
     {
         flag[4] = true;
         flag[0] = true;
-        registers[lowerOrder] = "FF";
-        int temp2 = hexToInt(registers[higherOrder]);
+        registers[lowerOrder] = 0xff;
+        int temp2 = registers[higherOrder];
         temp2--;
+        checkParityAndFlags(temp2,flag);
         if(temp2 < 0)
-            registers[higherOrder] = "FF";
+            registers[higherOrder] = 0xff;
         else
-            registers[higherOrder] = intToHex(temp2,2);
+            registers[higherOrder] = temp2;
     }    
     else
-        registers[lowerOrder] = intToHex(temp,2);
+        registers[lowerOrder] = temp;
 }
 
-void DAD(map <string,string>&registers , string &higherOrder,string &lowerOrder,vector <bool>& flag)
+void DAD(map <string,int>&registers , string &higherOrder,string &lowerOrder,vector <bool>& flag)
 {
-    int n = hexToInt(registers[lowerOrder]);
-    int n2 = hexToInt(registers["L"]) + n;
+    int n = registers[lowerOrder];
+    int n2 = registers["L"] + n;
     string trim = "";
     if(n2 > 255)
     {
-        trim = intToHex(n2,2);
-        cout<<trim<<endl;
-        registers["L"] = trim.substr(1);
-        int hn = hexToInt(registers["H"]);
-        int hn2 = hexToInt(registers[higherOrder]) + hn + 1;
+        registers["L"] = n2 % 256;
+        int hn = registers["H"];
+        int hn2 = registers[higherOrder] + hn + n2/256;
         if(hn2 > 255)
         {
             flag[4] = true;
-            trim = intToHex(hn2,2);
-            registers["H"] = trim.substr(1);
+            hn2 = hn2 % 256;
+            registers["H"] = hn2;
         }
         else
         {
             flag[4] = false;
-            registers["H"] = intToHex(hn2,2);
+            registers["H"] = hn2;
         }
     }
     else
     {   
-        registers["L"] = intToHex(n2,2);
-        int hn = hexToInt(registers["H"]);
-        int hn2 = hexToInt(registers[higherOrder]) + hn ;
+        registers["L"] = n2,2;
+        int hn = registers["H"];
+        int hn2 = registers[higherOrder] + hn ;
         if(hn2 > 255)
         {
-            flag[4] = true;
-            trim = intToHex(n2,2);
-            registers["H"] = trim.substr(1);
+            hn2 = hn2%256;
+            registers["H"] = hn2;
         }
         else
         {
             flag[4] = false;
-            registers["H"] = intToHex(hn2,2);
+            registers["H"] = hn2;
         }
     }
+    checkParityAndFlags(n2,flag);
 }
 
 #endif

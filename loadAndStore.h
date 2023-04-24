@@ -15,15 +15,17 @@ void MVI(map <string,int>&registers ,string &destination , string value )
     registers[destination] = convert(value);
 }
 
-void STA(map <int , int>&memory,map <string,int>&registers,string loca)
+void STA(map <int , int>&memory,map <string,int>&registers,string loca,set <int>&changed)
 {
     int address = convert(loca);
     memory[address] = registers["A"];
+    changed.insert(address);
 }
 
-void LDA(map <int , int>&memory,map <string,int>&registers,string loca)
+void LDA(map <int , int>&memory,map <string,int>&registers,string loca,set <int>&changed)
 {
     int address = convert(loca);
+    changed.insert(address);
     registers["A"] = memory[address];
 }
 
@@ -31,29 +33,32 @@ void LXI(map <string,int>&registers,string &higherOrder,string &lowerOrder,strin
 {
     string s = "";
     s = value.substr(0,2);
-    registers[higherOrder] = stoi(s);
+    registers[higherOrder] = convert(s);           // assigning the value to lower order register
     s = "";
     s = value.substr(2,2);
-    registers[lowerOrder] = stoi(s);
+    registers[lowerOrder] = convert(s);       // assigning the value to higher order register
 }
 
-void LHLD(map <int,int> &memory,map <string,int>&registers,string value)
+void LHLD(map <int,int> &memory,map <string,int>&registers,string value,set <int> &changed)
 {
     int address = convert(value);
-    registers["H"] =  memory[address];
+    changed.insert(address);
+    registers["L"] =  memory[address];
     address++;
-    registers["L"] = memory[address];
+    registers["H"] = memory[address];
 }
-void SHLD(map <string,string> &memory,map <string,string>&registers,string value)
+
+void SHLD(map <int,int> &memory,map <string,int>&registers,string value,set <int> &changed)
 {
-    memory[value] = registers["H"] ;
-    int incValue = hexToInt(value) + 1;
-    string nextVal = intToHex(incValue,4);
-    memory[nextVal] = registers["L"] ;
+    int address = convert(value);
+    changed.insert(address);
+    memory[address] = registers["L"] ;
+    address++;
+    memory[address] = registers["H"] ;
 }
-void XCHG(map <string,string> &registers)
+void XCHG(map <string,int> &registers)
 {
-    string temp = registers["H"];
+    int temp = registers["H"];
     registers["H"] = registers["D"];
     registers["D"] = temp;
     temp = registers["L"];
@@ -61,13 +66,19 @@ void XCHG(map <string,string> &registers)
     registers["E"] = temp;
 }
 
-void LDAX(map <string,string>&memory,map <string,string> &registers, string& rp1,string& rp2)
+void LDAX(map <int,int>&memory,map <string,int> &registers, string& rp1,string& rp2,set <int>&changed)
 {
-    registers["A"] = memory[registers[rp1]+registers[rp2]];
+    string address = intToHex(registers[rp1],2)  + intToHex(registers[rp2],2);
+    int address1 = convert(address);
+    changed.insert(address1);
+    registers["A"] = memory[convert(address)];
 }
-void STAX(map <string,string>&memory ,map <string,string> &registers ,string& rp1,string& rp2)
+void STAX(map <int,int>&memory ,map <string,int> &registers ,string& rp1,string& rp2,set <int>&changed)
 {
-    memory[registers[rp1]+registers[rp2]] = registers["A"];
+    string address = intToHex(registers[rp1],2)  + intToHex(registers[rp2],2);   // fetch address of memory
+    int address1 = convert(address);
+    changed.insert(address1);
+    memory[address1] = registers["A"];
 }
 
 #endif
