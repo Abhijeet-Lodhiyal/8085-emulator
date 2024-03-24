@@ -1,8 +1,10 @@
-#include <map>
 #include <vector>
 #include <iomanip>
 #include <set>
 #include <string>
+#include <fstream> 
+#include <algorithm>
+#include <map>
 #include <sstream>
 #include <iostream>
 #include "execute.h"
@@ -11,7 +13,6 @@
 using namespace std;
 int main()
 {
-
     // Memory initialization
     string start, file;
     int startVal = 0, choice = -1,getChoice = -1;
@@ -25,7 +26,7 @@ int main()
     vector<bool> flagReg(5, false);
     vector<pair<int, string>> code;
 
-
+    // ctrl + z for exit
     // User input
     cout << "Enter 1 to type program , enter 2 to open program from file location , enter 3 to open debugger mode" << endl;
     cin >> choice;
@@ -35,7 +36,7 @@ int main()
     }
     else if (choice == 2)
     {
-        inputFile(file,start,startVal,code);
+        inputFile(file,start,startVal,code);           // file stores -> path name
     }
     else if(choice == 3)
     {

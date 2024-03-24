@@ -1,8 +1,8 @@
-#include "loadAndStore.h"
-#include "arithmetic.h"
-#include "logical.h"
+#include "Operations/loadAndStore.h"
+#include "Operations/arithmetic.h"
+#include "Operations/logical.h"
 #include "utility.h"
-#include "branch.h"
+#include "Operations/branch.h"
 using namespace std;
 
 void execute(map<int, int> &memory, map<string, int> &registers, vector<bool> &flagReg, vector<pair<int, string>> &code, set<int> &changed, int debugger = 0)

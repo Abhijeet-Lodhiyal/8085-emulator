@@ -45,6 +45,8 @@
         "map": "cpp",
         "vector": "cpp",
         "string": "cpp",
-        "deque": "cpp"
-    }
+        "deque": "cpp",
+        "algorithm": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

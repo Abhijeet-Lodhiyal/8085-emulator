@@ -1,10 +1,6 @@
-#include <string>
-#include <algorithm>
-#include <iostream>
 #include <cmath>
-#include <fstream> 
-#include <set>
-
+#include <string>
+#include <vector>
 using namespace std;
 #ifndef UTIL
 #define UTIL
@@ -159,7 +155,7 @@ int getBYTES(string code)             // get opcode bytes
 
 void inputUser(string &start,int &startVal,vector <pair<int,string>>&code)  // get input from user
 {
-    cout << "Enter starting address" << endl;
+    cout << "Enter starting address " << endl;
         cin >> start;
         if (!validCode(start, 4))
         {
@@ -171,7 +167,7 @@ void inputUser(string &start,int &startVal,vector <pair<int,string>>&code)  // g
             startVal = convert(start);
         }
         string input;
-        cout << "Enter code" << endl;
+        cout << "Enter code , ctrl + z to exit" << endl;
         cin.ignore();
         while (true)
         {
